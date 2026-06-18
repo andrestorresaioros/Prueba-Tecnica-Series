@@ -1,4 +1,5 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
+import Swal from 'sweetalert2';
 import { api } from './api/client';
 import type { CreateDirectorPayload, CreateSeriesPayload, Director, Series, SeriesStatus } from './types';
 
@@ -153,24 +154,68 @@ function App() {
   }
 
   async function deleteSeries(id: string) {
-    if (!confirm('¿Eliminar esta serie?')) return;
+    const result = await Swal.fire({
+      title: '¿Eliminar esta serie?',
+      text: 'Esta acción no se puede deshacer.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#64748b',
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
       await api.deleteSeries(id);
-      showMessage('Serie eliminada correctamente.');
+      await Swal.fire({
+        title: 'Serie eliminada',
+        text: 'La serie se eliminó correctamente.',
+        icon: 'success',
+        timer: 1600,
+        showConfirmButton: false,
+      });
       await loadData();
     } catch (error) {
-      showMessage(error instanceof Error ? error.message : 'No fue posible eliminar la serie.');
+      await Swal.fire({
+        title: 'No fue posible eliminar la serie',
+        text: error instanceof Error ? error.message : 'Intenta nuevamente en unos segundos.',
+        icon: 'error',
+      });
     }
   }
 
   async function deleteDirector(id: string) {
-    if (!confirm('¿Eliminar este director? También se eliminarán sus asociaciones con series.')) return;
+    const result = await Swal.fire({
+      title: '¿Eliminar este director?',
+      text: 'También se eliminarán sus asociaciones con series.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#64748b',
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
       await api.deleteDirector(id);
-      showMessage('Director eliminado correctamente.');
+      await Swal.fire({
+        title: 'Director eliminado',
+        text: 'El director se eliminó correctamente.',
+        icon: 'success',
+        timer: 1600,
+        showConfirmButton: false,
+      });
       await loadData();
     } catch (error) {
-      showMessage(error instanceof Error ? error.message : 'No fue posible eliminar el director.');
+      await Swal.fire({
+        title: 'No fue posible eliminar el director',
+        text: error instanceof Error ? error.message : 'Intenta nuevamente en unos segundos.',
+        icon: 'error',
+      });
     }
   }
 
