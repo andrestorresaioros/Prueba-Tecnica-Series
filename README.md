@@ -124,6 +124,23 @@ erDiagram
     SERIES ||--o{ SERIES_DIRECTORS : has
     DIRECTORS ||--o{ SERIES_DIRECTORS : participates
 ```
+## Evidencia de funcionamiento
+
+A continuación se muestran evidencias del sistema desplegado y funcionando correctamente.
+
+### Frontend desplegado
+
+La siguiente imagen muestra el frontend desplegado en Vercel consumiendo la API REST desplegada en Render.
+
+![Frontend desplegado](docs/evidencia/Captura%20desde%202026-06-18%2013-47-11.png)
+![Frontend desplegado2](docs/evidencia/Captura%20desde%202026-06-18%2013-47-49.png)
+
+### Swagger API REST
+
+La siguiente imagen muestra la documentación Swagger de la API REST desplegada en Render, desde donde se pueden consultar y probar los endpoints de series y directores.
+
+![Swagger API REST](docs/evidencia/Captura%20desde%202026-06-18%2013-48-07.png)
+
 
 ## Decisiones de diseño
 
