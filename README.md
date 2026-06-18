@@ -1,58 +1,96 @@
-# OATI - Gestión de Series de Televisión y Directores
+# Prueba Técnica - Gestión de Series y Directores
 
-Solución del **punto #5** de la prueba técnica profesional: registrar series de televisión, registrar directores, asociarlos en una relación muchos a muchos, listar series con directores, consultar todas las series de un director, modificar y eliminar series/directores.
+Aplicación web desarrollada como solución al punto #5 de la prueba técnica profesional OATI - UD.
 
-## 1. Stack tecnológico
+El sistema permite registrar, consultar, modificar y eliminar información de series de televisión y directores, considerando una relación muchos a muchos: una serie puede tener varios directores y un director puede participar en muchas series.
 
-| Capa | Tecnología | Motivo |
-| --- | --- | --- |
-| Frontend | React + Vite + TypeScript | Cliente web ligero, rápido y fácil de desplegar en Vercel. |
-| Backend | NestJS + TypeScript | API REST modular, validaciones, controladores, servicios y Swagger. |
-| Persistencia | PostgreSQL | Modelo relacional coherente para relación muchos a muchos. |
-| ORM | Prisma | Modelo de datos declarativo, tipado y fácil de mantener. |
-| Documentación API | Swagger/OpenAPI | Permite probar endpoints desde `/api/docs`. |
-| Contenedores | Docker Compose | Levanta PostgreSQL local sin instalarlo manualmente. |
+## Enlaces de despliegue
 
-## 2. Reglas de negocio cubiertas
+- Frontend: URL_DE_TU_FRONTEND_EN_VERCEL
+- Backend API: https://prueba-tecnica-series.onrender.com/api/v1
+- Swagger: https://prueba-tecnica-series.onrender.com/api/docs
+- Health Check: https://prueba-tecnica-series.onrender.com/api/v1/health
 
-- Registrar información básica de series: nombre, fecha de lanzamiento, sinopsis, país, temporadas, calificación y estado.
-- Registrar información básica de directores: nombre, nacionalidad, fecha de nacimiento y biografía.
+> Nota: el backend está desplegado en Render Free, por lo que puede tardar algunos segundos en responder si el servicio ha estado inactivo.
+
+## Objetivo funcional
+
+El sistema permite gestionar la información básica de series de televisión, incluyendo:
+
+- Nombre
+- Fecha de lanzamiento
+- Sinopsis
+- País
+- Número de temporadas
+- Calificación
+- Estado de la serie
+- Directores asociados
+
+También permite gestionar directores, incluyendo:
+
+- Nombre completo
+- Nacionalidad
+- Fecha de nacimiento
+- Biografía
+
+La solución contempla que:
+
 - Una serie puede tener varios directores.
-- Un director puede participar en muchas series.
-- Listar series con su información y directores asociados.
-- Listar todas las series en las que ha participado un director.
-- Modificar y eliminar información de series y directores.
-- Persistencia en PostgreSQL.
-- API REST con operaciones CRUD y manejo de excepciones.
-- Frontend web para consulta, registro, edición y eliminación.
+- Un director puede estar asociado a varias series.
+- Se pueden listar series con sus respectivos directores.
+- Se pueden listar todas las series en las que ha participado un director.
+- Se puede modificar y eliminar la información de series y directores.
 
-## 3. Arquitectura
+## Stack tecnológico
+
+### Backend
+
+- Node.js
+- NestJS
+- TypeScript
+- Prisma ORM
+- PostgreSQL
+- Swagger / OpenAPI
+- Docker
+
+### Frontend
+
+- React
+- Vite
+- TypeScript
+- CSS
+- Fetch API
+
+### Base de datos
+
+- PostgreSQL
+- Base de datos local mediante Docker Compose
+- Base de datos productiva en Render PostgreSQL
+
+### Despliegue
+
+- Backend: Render
+- Base de datos: Render PostgreSQL
+- Frontend: Vercel
+
+## Arquitectura general
+
+La solución está estructurada separando responsabilidades entre frontend, backend y base de datos.
 
 ```mermaid
 flowchart LR
-    User[Usuario] --> Web[Frontend React + Vite]
-    Web -->|HTTP JSON| API[NestJS REST API]
-    API --> Swagger[Swagger UI /api/docs]
-    API --> Service[Capa de servicios]
-    Service --> Prisma[Prisma ORM]
-    Prisma --> DB[(PostgreSQL)]
+    A[Usuario] --> B[Frontend React + Vite]
+    B --> C[API REST NestJS]
+    C --> D[Prisma ORM]
+    D --> E[(PostgreSQL)]
 ```
 
-La aplicación separa responsabilidades en capas:
+## Modelo de datos
 
-- **Controladores:** exponen endpoints REST.
-- **DTOs:** validan y documentan los datos de entrada.
-- **Servicios:** contienen la lógica de negocio.
-- **Prisma:** administra la persistencia.
-- **Frontend:** consume la API y permite operar la información desde una interfaz web.
-
-## 4. Modelo de datos
+La relación entre series y directores es de muchos a muchos.
 
 ```mermaid
 erDiagram
-    SERIES ||--o{ SERIES_DIRECTORS : tiene
-    DIRECTORS ||--o{ SERIES_DIRECTORS : participa
-
     SERIES {
         string id PK
         string name
@@ -60,15 +98,15 @@ erDiagram
         string synopsis
         string country
         int seasons
-        decimal rating
-        enum status
+        float rating
+        string status
         datetime createdAt
         datetime updatedAt
     }
 
     DIRECTORS {
         string id PK
-        string fullName UK
+        string fullName
         string nationality
         datetime birthDate
         string biography
@@ -77,59 +115,97 @@ erDiagram
     }
 
     SERIES_DIRECTORS {
-        string seriesId PK, FK
-        string directorId PK, FK
+        string id PK
+        string serieId FK
+        string directorId FK
         string role
-        datetime createdAt
     }
+
+    SERIES ||--o{ SERIES_DIRECTORS : has
+    DIRECTORS ||--o{ SERIES_DIRECTORS : participates
 ```
 
-La tabla intermedia `series_directors` permite representar correctamente la relación muchos a muchos entre series y directores.
+## Decisiones de diseño
 
-## 5. Estructura del proyecto
+### Relación muchos a muchos
+
+Se implementó una tabla intermedia para representar la participación de directores en series. Esto permite que una serie tenga múltiples directores y que un director pueda participar en múltiples series.
+
+Además, la tabla intermedia permite almacenar información adicional de la relación, como el rol del director dentro de la serie.
+
+### Eliminación de directores
+
+Cuando se elimina un director, se eliminan sus asociaciones con las series, pero no se eliminan las series asociadas.
+
+Esta decisión se tomó porque las series y los directores son entidades independientes dentro de una relación muchos a muchos. Eliminar un director no debería provocar la eliminación automática de una serie completa, ya que esto podría generar pérdida accidental de información.
+
+Por ejemplo, si una serie tiene varios directores y uno de ellos es eliminado, la serie debe permanecer registrada en el sistema.
+
+Comportamiento definido:
 
 ```text
-oati-series-directors/
-├── backend/
-│   ├── prisma/
-│   │   ├── schema.prisma
-│   │   └── seed.ts
-│   └── src/
-│       ├── common/
-│       ├── directors/
-│       ├── series/
-│       ├── app.module.ts
-│       └── main.ts
-├── frontend/
-│   ├── src/
-│   │   ├── api/
-│   │   ├── App.tsx
-│   │   ├── styles.css
-│   │   └── types.ts
-├── docs/
-│   ├── arquitectura.mmd
-│   ├── modelo-datos.mmd
-│   └── requests.http
-├── docker-compose.yml
-├── render.yaml
-└── README.md
+Eliminar director -> eliminar director y sus relaciones con series.
+Eliminar serie -> eliminar serie y sus relaciones con directores.
 ```
 
-## 6. Ejecución local
+## Estructura del proyecto
 
-### 6.1. Requisitos
+```text
+.
+├── backend
+│   ├── prisma
+│   │   ├── schema.prisma
+│   │   └── seed.ts
+│   ├── src
+│   │   ├── common
+│   │   ├── modules
+│   │   │   ├── directors
+│   │   │   └── series
+│   │   ├── app.module.ts
+│   │   └── main.ts
+│   ├── Dockerfile
+│   ├── .env.example
+│   └── package.json
+│
+├── frontend
+│   ├── src
+│   │   ├── components
+│   │   ├── services
+│   │   ├── types
+│   │   └── App.tsx
+│   ├── .env.example
+│   └── package.json
+│
+├── docker-compose.yml
+├── README.md
+└── .gitignore
+```
 
-- Node.js 20 o superior.
-- Docker y Docker Compose.
-- npm.
+## Ejecución local
 
-### 6.2. Levantar base de datos
+### Requisitos previos
+
+- Node.js 20 o superior
+- Docker
+- Docker Compose
+- npm
+
+## 1. Clonar el repositorio
+
+```bash
+git clone URL_DEL_REPOSITORIO
+cd Prueba-Tecnica-Series
+```
+
+## 2. Levantar PostgreSQL local
+
+Desde la raíz del proyecto:
 
 ```bash
 docker compose up -d postgres
 ```
 
-### 6.3. Configurar backend
+## 3. Configurar backend
 
 ```bash
 cd backend
@@ -141,13 +217,19 @@ npm run db:seed
 npm run start:dev
 ```
 
-Backend disponible en:
+El backend quedará disponible en:
 
-- API: `http://localhost:3000/api/v1`
-- Swagger: `http://localhost:3000/api/docs`
-- Health check: `http://localhost:3000/api/v1/health`
+```text
+http://localhost:3000/api/v1
+```
 
-### 6.4. Configurar frontend
+Swagger estará disponible en:
+
+```text
+http://localhost:3000/api/docs
+```
+
+## 4. Configurar frontend
 
 En otra terminal:
 
@@ -158,104 +240,270 @@ npm install
 npm run dev
 ```
 
-Frontend disponible en:
+El frontend quedará disponible en:
 
 ```text
 http://localhost:5173
 ```
 
-## 7. Endpoints principales
+## Variables de entorno
 
-| Método | Endpoint | Descripción |
-| --- | --- | --- |
-| `GET` | `/api/v1/health` | Validar disponibilidad del servicio. |
-| `POST` | `/api/v1/directors` | Crear director. |
-| `GET` | `/api/v1/directors` | Listar directores con sus series. |
-| `GET` | `/api/v1/directors/:id` | Consultar director por id. |
-| `GET` | `/api/v1/directors/:id/series` | Consultar series asociadas a un director. |
-| `PATCH` | `/api/v1/directors/:id` | Actualizar director. |
-| `DELETE` | `/api/v1/directors/:id` | Eliminar director. |
-| `POST` | `/api/v1/series` | Crear serie y asociar directores. |
-| `GET` | `/api/v1/series` | Listar series con directores. |
-| `GET` | `/api/v1/series/:id` | Consultar serie por id. |
-| `PATCH` | `/api/v1/series/:id` | Actualizar serie y/o directores asociados. |
-| `DELETE` | `/api/v1/series/:id` | Eliminar serie. |
+### Backend
 
-## 8. Ejemplo de uso API
+Archivo: `backend/.env`
 
-### Crear director
-
-```bash
-curl -X POST http://localhost:3000/api/v1/directors \
-  -H "Content-Type: application/json" \
-  -d '{
-    "fullName": "Vince Gilligan",
-    "nationality": "Estadounidense",
-    "birthDate": "1967-02-10",
-    "biography": "Creador y director de televisión."
-  }'
+```env
+DATABASE_URL="postgresql://oati:oati_password@localhost:5432/oati_series?schema=public"
+PORT=3000
+CORS_ORIGIN="http://localhost:5173"
 ```
 
-### Crear serie
+### Frontend
 
-Reemplaza `DIRECTOR_ID` por el id retornado al crear/listar directores.
+Archivo: `frontend/.env`
 
-```bash
-curl -X POST http://localhost:3000/api/v1/series \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Breaking Bad",
-    "releaseDate": "2008-01-20",
-    "synopsis": "Drama criminal sobre un profesor de química.",
-    "country": "Estados Unidos",
-    "seasons": 5,
-    "rating": 9.5,
-    "status": "FINISHED",
-    "directorIds": ["DIRECTOR_ID"]
-  }'
+```env
+VITE_API_URL=http://localhost:3000/api/v1
 ```
 
-## 9. Despliegue sugerido
+Para producción en Vercel:
 
-### Backend en Render o Railway
+```env
+VITE_API_URL=https://prueba-tecnica-series.onrender.com/api/v1
+```
 
-1. Crear una base de datos PostgreSQL gratuita en Neon, Supabase, Railway o Render.
-2. Crear un servicio web para la carpeta `backend`.
-3. Configurar variables de entorno:
-   - `DATABASE_URL`
-   - `PORT=3000`
-   - `CORS_ORIGIN=https://URL-DEL-FRONTEND`
-4. Usar Dockerfile del backend o estos comandos:
-   - Build: `npm install && npm run db:generate && npm run build`
-   - Start: `npx prisma db push && npm run start`
+## Endpoints principales
 
-### Frontend en Vercel
+### Health Check
 
-1. Importar el repositorio en Vercel.
-2. Configurar la carpeta raíz como `frontend`.
-3. Variable de entorno:
-   - `VITE_API_URL=https://URL-DEL-BACKEND/api/v1`
-4. Deploy.
+```http
+GET /api/v1/health
+```
 
-## 10. Buenas prácticas implementadas
+### Series
 
-- Separación por módulos (`series`, `directors`, `common`).
-- DTOs con validaciones usando `class-validator`.
-- Manejo de errores de Prisma para duplicados y registros inexistentes.
-- Relación muchos a muchos explícita con tabla intermedia.
-- Prefijo versionado de API: `/api/v1`.
-- Swagger para documentación y pruebas manuales.
-- Docker Compose para base de datos local.
-- Frontend con formularios de creación, edición, eliminación y consulta.
-- `.gitignore`, `.env.example`, documentación y colección HTTP de pruebas.
+```http
+GET /api/v1/series
+```
 
-## 11. Evidencia de funcionamiento sugerida para adjuntar
+Lista todas las series con sus directores asociados.
 
-Cuando subas el proyecto al repositorio, agrega al README capturas o un GIF de:
+```http
+GET /api/v1/series/:id
+```
 
-1. Swagger cargando en `/api/docs`.
-2. Creación de un director.
-3. Creación de una serie seleccionando uno o varios directores.
-4. Listado de series con sus directores.
-5. Consulta de series por director.
-6. Edición y eliminación desde el frontend.
+Consulta una serie por ID.
+
+```http
+POST /api/v1/series
+```
+
+Crea una nueva serie.
+
+Ejemplo de body:
+
+```json
+{
+  "name": "Nueva Serie",
+  "releaseDate": "2026-06-18",
+  "synopsis": "Serie creada para validar la prueba técnica.",
+  "country": "Colombia",
+  "seasons": 1,
+  "rating": 8.5,
+  "status": "IN_PRODUCTION",
+  "directorIds": ["ID_DEL_DIRECTOR"]
+}
+```
+
+```http
+PATCH /api/v1/series/:id
+```
+
+Actualiza la información de una serie.
+
+```http
+DELETE /api/v1/series/:id
+```
+
+Elimina una serie y sus asociaciones con directores.
+
+### Directores
+
+```http
+GET /api/v1/directors
+```
+
+Lista todos los directores.
+
+```http
+GET /api/v1/directors/:id
+```
+
+Consulta un director por ID.
+
+```http
+GET /api/v1/directors/:id/series
+```
+
+Lista todas las series en las que ha participado un director.
+
+```http
+POST /api/v1/directors
+```
+
+Crea un nuevo director.
+
+Ejemplo de body:
+
+```json
+{
+  "fullName": "Christopher Nolan",
+  "nationality": "Británico",
+  "birthDate": "1970-07-30",
+  "biography": "Director, guionista y productor reconocido por sus obras de ciencia ficción y drama."
+}
+```
+
+```http
+PATCH /api/v1/directors/:id
+```
+
+Actualiza la información de un director.
+
+```http
+DELETE /api/v1/directors/:id
+```
+
+Elimina un director y sus asociaciones con series. Las series asociadas permanecen registradas.
+
+## Documentación Swagger
+
+La API cuenta con documentación Swagger disponible en:
+
+```text
+https://prueba-tecnica-series.onrender.com/api/docs
+```
+
+En ambiente local:
+
+```text
+http://localhost:3000/api/docs
+```
+
+Desde Swagger se pueden probar directamente los endpoints de series y directores.
+
+## Scripts principales
+
+### Backend
+
+```bash
+npm run start:dev
+```
+
+Ejecuta el backend en modo desarrollo.
+
+```bash
+npm run build
+```
+
+Compila el backend.
+
+```bash
+npm run db:generate
+```
+
+Genera el cliente de Prisma.
+
+```bash
+npm run db:push
+```
+
+Sincroniza el esquema de Prisma con la base de datos.
+
+```bash
+npm run db:seed
+```
+
+Carga datos iniciales de prueba.
+
+### Frontend
+
+```bash
+npm run dev
+```
+
+Ejecuta el frontend en modo desarrollo.
+
+```bash
+npm run build
+```
+
+Compila el frontend para producción.
+
+## Datos de prueba
+
+El proyecto incluye un seed con datos de ejemplo para validar la funcionalidad del sistema.
+
+Ejemplos de series:
+
+- Breaking Bad
+- Mindhunter
+
+Ejemplos de directores:
+
+- Vince Gilligan
+- Michelle MacLaren
+- David Fincher
+
+## Validaciones y manejo de errores
+
+La API implementa validaciones básicas para los datos de entrada y manejo de excepciones para casos como:
+
+- Recurso no encontrado
+- Datos inválidos
+- Relaciones inexistentes
+- Errores de persistencia
+
+## Buenas prácticas aplicadas
+
+- Separación de responsabilidades por módulos
+- Arquitectura backend modular
+- Uso de DTOs para entrada de datos
+- Uso de Prisma como capa de acceso a datos
+- Documentación con Swagger
+- Variables de entorno
+- Persistencia en PostgreSQL
+- Relación muchos a muchos mediante tabla intermedia
+- Despliegue separado de frontend, backend y base de datos
+- Uso de Docker para backend y base de datos local
+- Configuración CORS para consumo desde frontend desplegado
+
+## Evidencia sugerida
+
+Para la entrega se recomienda incluir capturas de:
+
+```text
+docs/evidencia/frontend-listado-series.png
+docs/evidencia/frontend-listado-directores.png
+docs/evidencia/swagger-endpoints.png
+docs/evidencia/crear-serie.png
+docs/evidencia/series-por-director.png
+docs/evidencia/render-backend.png
+docs/evidencia/vercel-frontend.png
+```
+
+## Estado del proyecto
+
+El proyecto se encuentra desplegado y funcional.
+
+Funcionalidades implementadas:
+
+- CRUD de series
+- CRUD de directores
+- Asociación de series con directores
+- Listado de series con directores
+- Listado de series por director
+- Persistencia en PostgreSQL
+- API REST documentada con Swagger
+- Frontend web funcional
+- Despliegue en Render y Vercel
