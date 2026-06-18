@@ -6,7 +6,7 @@ El sistema permite registrar, consultar, modificar y eliminar información de se
 
 ## Enlaces de despliegue
 
-- Frontend: URL_DE_TU_FRONTEND_EN_VERCEL
+- Frontend: https://prueba-tecnica-series.vercel.app/
 - Backend API: https://prueba-tecnica-series.onrender.com/api/v1
 - Swagger: https://prueba-tecnica-series.onrender.com/api/docs
 - Health Check: https://prueba-tecnica-series.onrender.com/api/v1/health
