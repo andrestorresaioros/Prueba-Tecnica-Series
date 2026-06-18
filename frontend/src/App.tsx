@@ -206,7 +206,12 @@ function App() {
             participar en muchas series.
           </p>
         </div>
-        <a href="http://localhost:3000/api/docs" target="_blank" rel="noreferrer" className="swagger-link">
+        <a
+          href={(import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api/v1').replace('/api/v1', '/api/docs')}
+          target="_blank"
+          rel="noreferrer"
+          className="swagger-link"
+        >
           Ver Swagger
         </a>
       </section>
