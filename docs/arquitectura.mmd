@@ -1,0 +1,7 @@
+flowchart LR
+    User[Usuario] --> Web[Frontend React + Vite]
+    Web -->|HTTP JSON| API[NestJS REST API]
+    API --> Swagger[Swagger UI /api/docs]
+    API --> Service[Capa de servicios]
+    Service --> Prisma[Prisma ORM]
+    Prisma --> DB[(PostgreSQL)]

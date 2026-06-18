@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: oati_series_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: oati
+      POSTGRES_PASSWORD: oati_password
+      POSTGRES_DB: oati_series
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U oati -d oati_series"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:

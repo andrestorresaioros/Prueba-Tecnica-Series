@@ -1,0 +1,37 @@
+### Health
+GET http://localhost:3000/api/v1/health
+
+### Crear director
+POST http://localhost:3000/api/v1/directors
+Content-Type: application/json
+
+{
+  "fullName": "Vince Gilligan",
+  "nationality": "Estadounidense",
+  "birthDate": "1967-02-10",
+  "biography": "Creador y director de televisión."
+}
+
+### Listar directores
+GET http://localhost:3000/api/v1/directors
+
+### Crear serie - reemplaza el id del director
+POST http://localhost:3000/api/v1/series
+Content-Type: application/json
+
+{
+  "name": "Breaking Bad",
+  "releaseDate": "2008-01-20",
+  "synopsis": "Drama criminal sobre un profesor de química.",
+  "country": "Estados Unidos",
+  "seasons": 5,
+  "rating": 9.5,
+  "status": "FINISHED",
+  "directorIds": ["DIRECTOR_ID"]
+}
+
+### Listar series con directores
+GET http://localhost:3000/api/v1/series
+
+### Listar series por director
+GET http://localhost:3000/api/v1/directors/DIRECTOR_ID/series

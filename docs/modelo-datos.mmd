@@ -1,0 +1,33 @@
+erDiagram
+    SERIES ||--o{ SERIES_DIRECTORS : tiene
+    DIRECTORS ||--o{ SERIES_DIRECTORS : participa
+
+    SERIES {
+        string id PK
+        string name
+        datetime releaseDate
+        string synopsis
+        string country
+        int seasons
+        decimal rating
+        enum status
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    DIRECTORS {
+        string id PK
+        string fullName UK
+        string nationality
+        datetime birthDate
+        string biography
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    SERIES_DIRECTORS {
+        string seriesId PK, FK
+        string directorId PK, FK
+        string role
+        datetime createdAt
+    }

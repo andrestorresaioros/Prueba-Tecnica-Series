@@ -1,0 +1,15 @@
+{
+  "name": "oati-series-directors",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Solución prueba técnica OATI - Punto 5: series de televisión y directores.",
+  "scripts": {
+    "install:all": "npm --prefix backend install && npm --prefix frontend install",
+    "dev": "concurrently \"npm --prefix backend run start:dev\" \"npm --prefix frontend run dev\"",
+    "db:up": "docker compose up -d postgres",
+    "db:down": "docker compose down"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
