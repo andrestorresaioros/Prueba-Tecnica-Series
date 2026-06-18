@@ -495,19 +495,6 @@ La API implementa validaciones básicas para los datos de entrada y manejo de ex
 - Uso de Docker para backend y base de datos local
 - Configuración CORS para consumo desde frontend desplegado
 
-## Evidencia sugerida
-
-Para la entrega se recomienda incluir capturas de:
-
-```text
-docs/evidencia/frontend-listado-series.png
-docs/evidencia/frontend-listado-directores.png
-docs/evidencia/swagger-endpoints.png
-docs/evidencia/crear-serie.png
-docs/evidencia/series-por-director.png
-docs/evidencia/render-backend.png
-docs/evidencia/vercel-frontend.png
-```
 
 ## Estado del proyecto
 
