@@ -1,5 +1,13 @@
 # Prueba Técnica - Gestión de Series y Directores
 
+![NestJS](https://img.shields.io/badge/NestJS-E0234E?style=flat&logo=nestjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white)
+![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=flat&logo=prisma&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=flat&logo=postgresql&logoColor=white)
+![React](https://img.shields.io/badge/React-61DAFB?style=flat&logo=react&logoColor=black)
+![Swagger](https://img.shields.io/badge/Swagger-85EA2D?style=flat&logo=swagger&logoColor=black)
+[![Demo](https://img.shields.io/badge/demo-Vercel-000000?style=flat&logo=vercel&logoColor=white)](https://prueba-tecnica-series.vercel.app/)
+
 Aplicación web desarrollada como solución al punto #5 de la prueba técnica profesional OATI - UD.
 
 El sistema permite registrar, consultar, modificar y eliminar información de series de televisión y directores, considerando una relación muchos a muchos: una serie puede tener varios directores y un director puede participar en muchas series.
@@ -169,33 +177,30 @@ Eliminar serie -> eliminar serie y sus relaciones con directores.
 
 ```text
 .
-├── backend
-│   ├── prisma
-│   │   ├── schema.prisma
-│   │   └── seed.ts
-│   ├── src
-│   │   ├── common
-│   │   ├── modules
-│   │   │   ├── directors
-│   │   │   └── series
+├── backend/                      # API REST (NestJS + Prisma)
+│   ├── prisma/
+│   │   ├── schema.prisma         # Modelo de datos
+│   │   └── seed.ts               # Datos de ejemplo
+│   ├── src/
+│   │   ├── common/               # Prisma service y filtro global de excepciones
+│   │   ├── directors/            # Módulo de directores (controller, service, DTOs)
+│   │   ├── series/               # Módulo de series (controller, service, DTOs)
+│   │   ├── health.controller.ts  # Health check
 │   │   ├── app.module.ts
-│   │   └── main.ts
+│   │   └── main.ts               # Arranque, CORS, validación y Swagger
 │   ├── Dockerfile
-│   ├── .env.example
-│   └── package.json
-│
-├── frontend
-│   ├── src
-│   │   ├── components
-│   │   ├── services
-│   │   ├── types
-│   │   └── App.tsx
-│   ├── .env.example
-│   └── package.json
-│
-├── docker-compose.yml
-├── README.md
-└── .gitignore
+│   └── .env.example
+├── frontend/                     # SPA (React + Vite + TypeScript)
+│   ├── src/
+│   │   ├── api/client.ts         # Cliente HTTP de la API
+│   │   ├── types.ts              # Tipos compartidos
+│   │   └── App.tsx               # Interfaz principal
+│   ├── vercel.json
+│   └── .env.example
+├── docs/                         # Diagramas Mermaid y colección de peticiones HTTP
+├── docker-compose.yml            # PostgreSQL local
+├── render.yaml                   # Despliegue del backend en Render
+└── package.json                  # Scripts para levantar todo el proyecto
 ```
 
 ## Ejecución local
@@ -511,3 +516,11 @@ Funcionalidades implementadas:
 - API REST documentada con Swagger
 - Frontend web funcional
 - Despliegue en Render y Vercel
+
+## Autor
+
+**César Andrés Torres Bernal** · [GitHub](https://github.com/andrestorresaioros) · [LinkedIn](https://www.linkedin.com/in/andr%C3%A9s-torres10)
+
+## Licencia
+
+Distribuido bajo la licencia MIT. Consulta [LICENSE](LICENSE).
